@@ -28,3 +28,8 @@ dist-ssr
 
 
 docs
+# Keep the frontend implementation plan under version control.
+!/docs/
+/docs/*
+!/docs/plano.md
+

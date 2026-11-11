@@ -15,10 +15,19 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AppLinksRouteImport } from './routes/app/links'
+import { Route as AppMenuRouteRouteImport } from './routes/app/menu/route'
 import { Route as AppOnboardingRouteImport } from './routes/app/onboarding'
+import { Route as AppOrdersRouteImport } from './routes/app/orders'
+import { Route as AppReportsRouteImport } from './routes/app/reports'
 import { Route as AppRestaurantsRouteImport } from './routes/app/restaurants'
 import { Route as AppTablesRouteImport } from './routes/app/tables'
 import { Route as AppTeamRouteImport } from './routes/app/team'
+import { Route as AppUsersRouteImport } from './routes/app/users'
+import { Route as MTokenRouteImport } from './routes/m.$token'
+import { Route as OrdersPublicCodeRouteImport } from './routes/orders/$publicCode'
+import { Route as AppMenuIndexRouteImport } from './routes/app/menu/index'
+import { Route as AppMenuCategoriesRouteImport } from './routes/app/menu/categories'
+import { Route as AppMenuProductsRouteImport } from './routes/app/menu/products'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -50,9 +59,24 @@ const AppLinksRoute = AppLinksRouteImport.update({
   path: '/links',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppMenuRouteRoute = AppMenuRouteRouteImport.update({
+  id: '/menu',
+  path: '/menu',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppOnboardingRoute = AppOnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppOrdersRoute = AppOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppReportsRoute = AppReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppRestaurantsRoute = AppRestaurantsRouteImport.update({
@@ -70,18 +94,57 @@ const AppTeamRoute = AppTeamRouteImport.update({
   path: '/team',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppUsersRoute = AppUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const MTokenRoute = MTokenRouteImport.update({
+  id: '/m/$token',
+  path: '/m/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrdersPublicCodeRoute = OrdersPublicCodeRouteImport.update({
+  id: '/orders/$publicCode',
+  path: '/orders/$publicCode',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppMenuIndexRoute = AppMenuIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppMenuRouteRoute,
+} as any)
+const AppMenuCategoriesRoute = AppMenuCategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => AppMenuRouteRoute,
+} as any)
+const AppMenuProductsRoute = AppMenuProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => AppMenuRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/app/menu': typeof AppMenuRouteRouteWithChildren
   '/app/links': typeof AppLinksRoute
   '/app/onboarding': typeof AppOnboardingRoute
+  '/app/orders': typeof AppOrdersRoute
+  '/app/reports': typeof AppReportsRoute
   '/app/restaurants': typeof AppRestaurantsRoute
   '/app/tables': typeof AppTablesRoute
   '/app/team': typeof AppTeamRoute
+  '/app/users': typeof AppUsersRoute
+  '/m/$token': typeof MTokenRoute
+  '/orders/$publicCode': typeof OrdersPublicCodeRoute
   '/app/': typeof AppIndexRoute
+  '/app/menu/categories': typeof AppMenuCategoriesRoute
+  '/app/menu/products': typeof AppMenuProductsRoute
+  '/app/menu/': typeof AppMenuIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -89,10 +152,18 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/app/links': typeof AppLinksRoute
   '/app/onboarding': typeof AppOnboardingRoute
+  '/app/orders': typeof AppOrdersRoute
+  '/app/reports': typeof AppReportsRoute
   '/app/restaurants': typeof AppRestaurantsRoute
   '/app/tables': typeof AppTablesRoute
   '/app/team': typeof AppTeamRoute
+  '/app/users': typeof AppUsersRoute
+  '/m/$token': typeof MTokenRoute
+  '/orders/$publicCode': typeof OrdersPublicCodeRoute
   '/app': typeof AppIndexRoute
+  '/app/menu/categories': typeof AppMenuCategoriesRoute
+  '/app/menu/products': typeof AppMenuProductsRoute
+  '/app/menu': typeof AppMenuIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -100,12 +171,21 @@ export interface FileRoutesById {
   '/app': typeof AppRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/app/menu': typeof AppMenuRouteRouteWithChildren
   '/app/links': typeof AppLinksRoute
   '/app/onboarding': typeof AppOnboardingRoute
+  '/app/orders': typeof AppOrdersRoute
+  '/app/reports': typeof AppReportsRoute
   '/app/restaurants': typeof AppRestaurantsRoute
   '/app/tables': typeof AppTablesRoute
   '/app/team': typeof AppTeamRoute
+  '/app/users': typeof AppUsersRoute
+  '/m/$token': typeof MTokenRoute
+  '/orders/$publicCode': typeof OrdersPublicCodeRoute
   '/app/': typeof AppIndexRoute
+  '/app/menu/categories': typeof AppMenuCategoriesRoute
+  '/app/menu/products': typeof AppMenuProductsRoute
+  '/app/menu/': typeof AppMenuIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -114,12 +194,21 @@ export interface FileRouteTypes {
     | '/app'
     | '/login'
     | '/signup'
+    | '/app/menu'
     | '/app/links'
     | '/app/onboarding'
+    | '/app/orders'
+    | '/app/reports'
     | '/app/restaurants'
     | '/app/tables'
     | '/app/team'
+    | '/app/users'
+    | '/m/$token'
+    | '/orders/$publicCode'
     | '/app/'
+    | '/app/menu/categories'
+    | '/app/menu/products'
+    | '/app/menu/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -127,22 +216,39 @@ export interface FileRouteTypes {
     | '/signup'
     | '/app/links'
     | '/app/onboarding'
+    | '/app/orders'
+    | '/app/reports'
     | '/app/restaurants'
     | '/app/tables'
     | '/app/team'
+    | '/app/users'
+    | '/m/$token'
+    | '/orders/$publicCode'
     | '/app'
+    | '/app/menu/categories'
+    | '/app/menu/products'
+    | '/app/menu'
   id:
     | '__root__'
     | '/'
     | '/app'
     | '/login'
     | '/signup'
+    | '/app/menu'
     | '/app/links'
     | '/app/onboarding'
+    | '/app/orders'
+    | '/app/reports'
     | '/app/restaurants'
     | '/app/tables'
     | '/app/team'
+    | '/app/users'
+    | '/m/$token'
+    | '/orders/$publicCode'
     | '/app/'
+    | '/app/menu/categories'
+    | '/app/menu/products'
+    | '/app/menu/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -150,6 +256,8 @@ export interface RootRouteChildren {
   AppRouteRoute: typeof AppRouteRouteWithChildren
   LoginRoute: typeof LoginRoute
   SignupRoute: typeof SignupRoute
+  MTokenRoute: typeof MTokenRoute
+  OrdersPublicCodeRoute: typeof OrdersPublicCodeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -196,11 +304,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppLinksRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/menu': {
+      id: '/app/menu'
+      path: '/menu'
+      fullPath: '/app/menu'
+      preLoaderRoute: typeof AppMenuRouteRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/app/onboarding': {
       id: '/app/onboarding'
       path: '/onboarding'
       fullPath: '/app/onboarding'
       preLoaderRoute: typeof AppOnboardingRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/orders': {
+      id: '/app/orders'
+      path: '/orders'
+      fullPath: '/app/orders'
+      preLoaderRoute: typeof AppOrdersRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/reports': {
+      id: '/app/reports'
+      path: '/reports'
+      fullPath: '/app/reports'
+      preLoaderRoute: typeof AppReportsRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/app/restaurants': {
@@ -224,24 +353,90 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppTeamRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/users': {
+      id: '/app/users'
+      path: '/users'
+      fullPath: '/app/users'
+      preLoaderRoute: typeof AppUsersRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/m/$token': {
+      id: '/m/$token'
+      path: '/m/$token'
+      fullPath: '/m/$token'
+      preLoaderRoute: typeof MTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/orders/$publicCode': {
+      id: '/orders/$publicCode'
+      path: '/orders/$publicCode'
+      fullPath: '/orders/$publicCode'
+      preLoaderRoute: typeof OrdersPublicCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/menu/': {
+      id: '/app/menu/'
+      path: '/'
+      fullPath: '/app/menu/'
+      preLoaderRoute: typeof AppMenuIndexRouteImport
+      parentRoute: typeof AppMenuRouteRoute
+    }
+    '/app/menu/categories': {
+      id: '/app/menu/categories'
+      path: '/categories'
+      fullPath: '/app/menu/categories'
+      preLoaderRoute: typeof AppMenuCategoriesRouteImport
+      parentRoute: typeof AppMenuRouteRoute
+    }
+    '/app/menu/products': {
+      id: '/app/menu/products'
+      path: '/products'
+      fullPath: '/app/menu/products'
+      preLoaderRoute: typeof AppMenuProductsRouteImport
+      parentRoute: typeof AppMenuRouteRoute
+    }
   }
 }
 
+interface AppMenuRouteRouteChildren {
+  AppMenuCategoriesRoute: typeof AppMenuCategoriesRoute
+  AppMenuProductsRoute: typeof AppMenuProductsRoute
+  AppMenuIndexRoute: typeof AppMenuIndexRoute
+}
+
+const AppMenuRouteRouteChildren: AppMenuRouteRouteChildren = {
+  AppMenuCategoriesRoute: AppMenuCategoriesRoute,
+  AppMenuProductsRoute: AppMenuProductsRoute,
+  AppMenuIndexRoute: AppMenuIndexRoute,
+}
+
+const AppMenuRouteRouteWithChildren = AppMenuRouteRoute._addFileChildren(
+  AppMenuRouteRouteChildren,
+)
+
 interface AppRouteRouteChildren {
+  AppMenuRouteRoute: typeof AppMenuRouteRouteWithChildren
   AppLinksRoute: typeof AppLinksRoute
   AppOnboardingRoute: typeof AppOnboardingRoute
+  AppOrdersRoute: typeof AppOrdersRoute
+  AppReportsRoute: typeof AppReportsRoute
   AppRestaurantsRoute: typeof AppRestaurantsRoute
   AppTablesRoute: typeof AppTablesRoute
   AppTeamRoute: typeof AppTeamRoute
+  AppUsersRoute: typeof AppUsersRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
+  AppMenuRouteRoute: AppMenuRouteRouteWithChildren,
   AppLinksRoute: AppLinksRoute,
   AppOnboardingRoute: AppOnboardingRoute,
+  AppOrdersRoute: AppOrdersRoute,
+  AppReportsRoute: AppReportsRoute,
   AppRestaurantsRoute: AppRestaurantsRoute,
   AppTablesRoute: AppTablesRoute,
   AppTeamRoute: AppTeamRoute,
+  AppUsersRoute: AppUsersRoute,
   AppIndexRoute: AppIndexRoute,
 }
 
@@ -254,6 +449,8 @@ const rootRouteChildren: RootRouteChildren = {
   AppRouteRoute: AppRouteRouteWithChildren,
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
+  MTokenRoute: MTokenRoute,
+  OrdersPublicCodeRoute: OrdersPublicCodeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

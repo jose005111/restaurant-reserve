@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ImagePlus, Loader2, Trash2, UploadCloud } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -27,11 +27,23 @@ export function AssetUpload({
   value,
   aspect = 'square',
 }: AssetUploadProps) {
+  const [selection, setSelection] = useState<{
+    file: File
+    url: string
+  } | null>(null)
+  const selectedFile = selection?.file
+  const previewUrl = selection?.url
+  useEffect(
+    () => () => {
+      if (selection) URL.revokeObjectURL(selection.url)
+    },
+    [selection],
+  )
   const inputRef = useRef<HTMLInputElement>(null)
   const uploadMutation = useUploadBrandingAsset()
   const removeMutation = useRemoveBrandingAsset()
 
-  const handleFile = async (file: File | undefined) => {
+  const handleFile = (file: File | undefined) => {
     if (!file) {
       return
     }
@@ -50,8 +62,14 @@ export function AssetUpload({
       return
     }
 
+    setSelection({ file, url: URL.createObjectURL(file) })
+  }
+
+  const handleUpload = async () => {
+    if (!selectedFile) return
     try {
-      await uploadMutation.mutateAsync({ asset, file })
+      await uploadMutation.mutateAsync({ asset, file: selectedFile })
+      setSelection(null)
       toast.success(`${label} actualizado`)
     } catch (error) {
       toast.error(getApiErrorMessage(error, 'Falha no upload'))
@@ -61,6 +79,7 @@ export function AssetUpload({
   const handleRemove = async () => {
     try {
       await removeMutation.mutateAsync(asset)
+      setSelection(null)
       toast.success(`${label} removido`)
     } catch (error) {
       toast.error(getApiErrorMessage(error, 'Não foi possível remover'))
@@ -81,9 +100,9 @@ export function AssetUpload({
           aspect === 'square' ? 'h-40 w-40' : 'h-28 w-full'
         }`}
       >
-        {value ? (
+        {previewUrl || value ? (
           <img
-            src={value}
+            src={previewUrl || value || undefined}
             alt={label}
             className="size-full object-cover"
           />
@@ -104,6 +123,7 @@ export function AssetUpload({
       <input
         ref={inputRef}
         type="file"
+        aria-label={`Seleccionar ${label}`}
         accept={ACCEPTED.join(',')}
         className="hidden"
         onChange={(event) => {
@@ -112,6 +132,11 @@ export function AssetUpload({
         }}
       />
 
+      {selectedFile ? (
+        <p className="text-xs text-muted-foreground">
+          {selectedFile.name} — por guardar. Guarda antes de mudar de passo.
+        </p>
+      ) : null}
       <div className="flex flex-wrap gap-2">
         <Button
           type="button"
@@ -123,6 +148,27 @@ export function AssetUpload({
           <UploadCloud className="size-4" />
           {value ? 'Substituir' : 'Carregar'}
         </Button>
+        {selectedFile ? (
+          <>
+            <Button
+              type="button"
+              size="sm"
+              disabled={isBusy}
+              onClick={() => void handleUpload()}
+            >
+              Guardar imagem
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled={isBusy}
+              onClick={() => setSelection(null)}
+            >
+              Cancelar selecção
+            </Button>
+          </>
+        ) : null}
         {value ? (
           <Button
             type="button"

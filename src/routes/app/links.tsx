@@ -2,6 +2,7 @@ import { createFileRoute, redirect } from '@tanstack/react-router'
 import {
   Copy,
   Download,
+  ExternalLink,
   Link2,
   Loader2,
   QrCode,
@@ -132,6 +133,16 @@ function LinksPage() {
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
+                  <Button type="button" variant="outline" asChild>
+                    <a
+                      href={linkQuery.data.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <ExternalLink className="size-4" />
+                      Abrir menu
+                    </a>
+                  </Button>
                   <Button
                     type="button"
                     variant="outline"

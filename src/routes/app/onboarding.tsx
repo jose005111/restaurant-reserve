@@ -36,11 +36,9 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 import { useBranding, useUpdateBranding } from '@/hooks/use-branding'
 import { getApiErrorMessage } from '@/lib/api'
+import { applyBranding, isOnboardingComplete } from '@/lib/branding'
 import {
-  applyBranding,
-  isOnboardingComplete,
-} from '@/lib/branding'
-import {
+  BRANDING_FONTS,
   onboardingSchema,
   type OnboardingFormValues,
 } from '@/schemas/onboarding'
@@ -95,7 +93,7 @@ function OnboardingPage() {
   return <OnboardingWizard branding={branding} />
 }
 
-function OnboardingWizard({ branding }: { branding: Branding }) {
+export function OnboardingWizard({ branding }: { branding: Branding }) {
   const navigate = useNavigate()
   const updateMutation = useUpdateBranding()
   const [step, setStep] = useState(0)
@@ -104,6 +102,9 @@ function OnboardingWizard({ branding }: { branding: Branding }) {
   const form = useForm<OnboardingFormValues>({
     resolver: zodResolver(onboardingSchema),
     defaultValues: {
+      fontFamily:
+        onboardingSchema.shape.fontFamily.safeParse(branding.fontFamily).data ??
+        '',
       welcomeTitle: branding.welcomeTitle ?? '',
       welcomeMessage: branding.welcomeMessage ?? '',
       footerText: branding.footerText ?? '',
@@ -174,6 +175,7 @@ function OnboardingWizard({ branding }: { branding: Branding }) {
     }
 
     const payload: UpdateBrandingInput = {
+      fontFamily: values.fontFamily || null,
       welcomeTitle: values.welcomeTitle.trim(),
       welcomeMessage: values.welcomeMessage.trim() || null,
       footerText: values.footerText.trim() || null,
@@ -272,7 +274,8 @@ function OnboardingWizard({ branding }: { branding: Branding }) {
 
           <CardContent>
             <form
-              onSubmit={handleFinish}
+              noValidate
+              onSubmit={(event) => event.preventDefault()}
               onKeyDown={preventEnterSubmit}
               className="space-y-6"
             >
@@ -285,6 +288,41 @@ function OnboardingWizard({ branding }: { branding: Branding }) {
                     value={branding.logoUrl}
                   />
 
+                  <p className="text-sm text-muted-foreground">
+                    Selecciona uma imagem e usa «Guardar imagem» para a enviar.
+                    As imagens guardam-se separadamente, sem concluir o
+                    formulário. «Remover» elimina imediatamente a imagem
+                    guardada.
+                  </p>
+                  <div className="grid gap-6 sm:grid-cols-2">
+                    <AssetUpload
+                      asset={BrandingAsset.LOGO_DARK}
+                      label="Logótipo para tema escuro (opcional)"
+                      description="Versão alternativa para fundos escuros."
+                      value={branding.logoDarkUrl}
+                    />
+                    <AssetUpload
+                      asset={BrandingAsset.FAVICON}
+                      label="Ícone do site (opcional)"
+                      description="Imagem quadrada em JPEG, PNG ou WebP."
+                      value={branding.faviconUrl}
+                    />
+                  </div>
+                  <AssetUpload
+                    asset={BrandingAsset.BANNER}
+                    label="Banner do menu (opcional)"
+                    description="Imagem larga apresentada no topo do menu."
+                    value={branding.bannerUrl}
+                    aspect="wide"
+                  />
+                  <AssetUpload
+                    asset={BrandingAsset.LOGIN_IMAGE}
+                    label="Imagem de entrada (opcional)"
+                    description="Imagem para a página de entrada do restaurante."
+                    value={branding.loginImageUrl}
+                    aspect="wide"
+                  />
+
                   <Field
                     label="Título de boas-vindas"
                     htmlFor="welcomeTitle"
@@ -293,9 +331,7 @@ function OnboardingWizard({ branding }: { branding: Branding }) {
                     <Input
                       id="welcomeTitle"
                       placeholder="Bem-vindo ao Sabor de Luanda"
-                      aria-invalid={Boolean(
-                        form.formState.errors.welcomeTitle,
-                      )}
+                      aria-invalid={Boolean(form.formState.errors.welcomeTitle)}
                       {...form.register('welcomeTitle')}
                     />
                   </Field>
@@ -375,6 +411,25 @@ function OnboardingWizard({ branding }: { branding: Branding }) {
                     />
                   </div>
 
+                  <Field
+                    label="Fonte (opcional)"
+                    htmlFor="fontFamily"
+                    hint="Usa uma fonte instalada no dispositivo; não são descarregadas fontes externas."
+                    error={form.formState.errors.fontFamily?.message}
+                  >
+                    <select
+                      id="fontFamily"
+                      className="h-10 w-full rounded-md border bg-background px-3 text-sm"
+                      {...form.register('fontFamily')}
+                    >
+                      <option value="">Fonte predefinida</option>
+                      {BRANDING_FONTS.map((font) => (
+                        <option key={font} value={font}>
+                          {font}
+                        </option>
+                      ))}
+                    </select>
+                  </Field>
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
                       <p className="text-sm font-medium">Tema</p>
@@ -481,14 +536,6 @@ function OnboardingWizard({ branding }: { branding: Branding }) {
                       />
                     </Field>
                   </div>
-
-                  <AssetUpload
-                    asset={BrandingAsset.BANNER}
-                    label="Banner do menu (opcional)"
-                    description="Imagem larga apresentada no topo do menu."
-                    value={branding.bannerUrl}
-                    aspect="wide"
-                  />
                 </div>
               ) : null}
 
@@ -509,7 +556,11 @@ function OnboardingWizard({ branding }: { branding: Branding }) {
                     <ArrowRight className="size-4" />
                   </Button>
                 ) : (
-                  <Button type="submit" disabled={updateMutation.isPending}>
+                  <Button
+                    type="button"
+                    onClick={() => void handleFinish()}
+                    disabled={updateMutation.isPending}
+                  >
                     {updateMutation.isPending ? (
                       <Loader2 className="size-4 animate-spin" />
                     ) : (
@@ -574,8 +625,8 @@ function OnboardingWizard({ branding }: { branding: Branding }) {
                 Pré-visualização em tempo real
               </CardTitle>
               <CardDescription>
-                As cores aplicam-se imediatamente ao painel. Ajusta até
-                ficarem confortáveis.
+                As cores aplicam-se imediatamente ao painel. Ajusta até ficarem
+                confortáveis.
               </CardDescription>
             </CardHeader>
           </Card>

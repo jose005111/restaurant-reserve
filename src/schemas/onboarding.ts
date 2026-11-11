@@ -1,4 +1,17 @@
 import { z } from 'zod'
+import type { UpdateBrandingInput } from '@/types/api'
+
+export const BRANDING_FONTS = [
+  'Inter',
+  'Roboto',
+  'Open Sans',
+  'Lato',
+  'Montserrat',
+  'Poppins',
+  'Nunito',
+  'Source Sans 3',
+  'Playfair Display',
+] as const satisfies readonly NonNullable<UpdateBrandingInput['fontFamily']>[]
 
 const hexColor = /^#[0-9A-Fa-f]{6}$/
 
@@ -11,8 +24,10 @@ const httpsUrl = z
   )
 
 export const onboardingSchema = z.object({
+  fontFamily: z.union([z.literal(''), z.enum(BRANDING_FONTS)]),
   welcomeTitle: z
     .string()
+    .trim()
     .min(1, 'Informe o título de boas-vindas')
     .max(120, 'Máximo de 120 caracteres'),
   welcomeMessage: z.string().max(300, 'Máximo de 300 caracteres'),

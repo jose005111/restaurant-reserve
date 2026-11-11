@@ -1,216 +1,114 @@
-export const UserRole = {
-  SUPER_ADMIN: 'SUPER_ADMIN',
-  ADMIN: 'ADMIN',
-  COUNTER: 'COUNTER',
-} as const
+import type { components, operations } from "./api.d";
 
-export type UserRole = (typeof UserRole)[keyof typeof UserRole]
+export const UserRole = {
+  SUPER_ADMIN: "SUPER_ADMIN",
+  ADMIN: "ADMIN",
+  COUNTER: "COUNTER",
+} as const;
+
+export type UserRole = (typeof UserRole)[keyof typeof UserRole];
 
 export const ThemeMode = {
-  LIGHT: 'LIGHT',
-  DARK: 'DARK',
-  SYSTEM: 'SYSTEM',
-} as const
+  LIGHT: "LIGHT",
+  DARK: "DARK",
+  SYSTEM: "SYSTEM",
+} as const;
 
-export type ThemeMode = (typeof ThemeMode)[keyof typeof ThemeMode]
+export type ThemeMode = (typeof ThemeMode)[keyof typeof ThemeMode];
 
 export const RestaurantStatus = {
-  ACTIVE: 'ACTIVE',
-  SUSPENDED: 'SUSPENDED',
-} as const
+  ACTIVE: "ACTIVE",
+  SUSPENDED: "SUSPENDED",
+} as const;
 
 export type RestaurantStatus =
-  (typeof RestaurantStatus)[keyof typeof RestaurantStatus]
+  (typeof RestaurantStatus)[keyof typeof RestaurantStatus];
 
 export const RestaurantPlan = {
-  FREE: 'FREE',
-  BASIC: 'BASIC',
-  PRO: 'PRO',
-} as const
+  FREE: "FREE",
+  BASIC: "BASIC",
+  PRO: "PRO",
+} as const;
 
 export type RestaurantPlan =
-  (typeof RestaurantPlan)[keyof typeof RestaurantPlan]
+  (typeof RestaurantPlan)[keyof typeof RestaurantPlan];
 
 export const BrandingAsset = {
-  LOGO: 'logo',
-  LOGO_DARK: 'logo-dark',
-  FAVICON: 'favicon',
-  BANNER: 'banner',
-  LOGIN_IMAGE: 'login-image',
-} as const
+  LOGO: "logo",
+  LOGO_DARK: "logo-dark",
+  FAVICON: "favicon",
+  BANNER: "banner",
+  LOGIN_IMAGE: "login-image",
+} as const;
 
-export type BrandingAsset =
-  (typeof BrandingAsset)[keyof typeof BrandingAsset]
+export type BrandingAsset = (typeof BrandingAsset)[keyof typeof BrandingAsset];
 
-export interface AuthUser {
-  id: string
-  name: string
-  email: string
-  role: UserRole
-  restaurantId: string | null
-}
+export type AuthUser = components["schemas"]["AuthUserDto"];
+export type AuthResponse = components["schemas"]["AuthResponseDto"];
+export type LoginInput = components["schemas"]["LoginDto"];
+export type Restaurant = components["schemas"]["RestaurantResponseDto"];
+export type RestaurantActivity =
+  components["schemas"]["RestaurantActivityResponseDto"];
+export type UpdateRestaurantInput =
+  components["schemas"]["UpdateRestaurantDto"];
+export type UpdateRestaurantStatusInput =
+  components["schemas"]["UpdateRestaurantStatusDto"];
+export type CreateRestaurantAdminInput =
+  components["schemas"]["CreateRestaurantAdminDto"];
+export type CreateRestaurantInput =
+  components["schemas"]["CreateRestaurantDto"];
+export type PublicSignupInput = components["schemas"]["PublicSignupDto"];
+export type DiningTable = components["schemas"]["DiningTableResponseDto"];
+export type CreateTableInput = components["schemas"]["CreateDiningTableDto"];
+export type UpdateTableInput = components["schemas"]["UpdateDiningTableDto"];
+export type TableQr = components["schemas"]["TableQrResponseDto"];
+export type GenericLink = components["schemas"]["GenericLinkResponseDto"];
+export type StaffUser = components["schemas"]["UserResponseDto"];
+export type UserQuery = NonNullable<
+  operations["UsersController_findAll"]["parameters"]["query"]
+>;
+export type CreateUserInput = components["schemas"]["CreateUserDto"];
+export type UpdateUserInput = components["schemas"]["UpdateUserDto"];
+export type Branding = components["schemas"]["BrandingResponseDto"];
+export type UpdateBrandingInput = components["schemas"]["UpdateBrandingDto"];
+export type ApiErrorPayload = components["schemas"]["ApiErrorDto"];
 
-export interface AuthResponse {
-  accessToken: string
-  user: AuthUser
-}
+export type Category = components["schemas"]["CategoryResponseDto"];
+export type CreateCategoryInput = components["schemas"]["CreateCategoryDto"];
+export type UpdateCategoryInput = components["schemas"]["UpdateCategoryDto"];
+export type MenuItem = components["schemas"]["MenuItemResponseDto"];
+export type CreateMenuItemInput = components["schemas"]["CreateMenuItemDto"];
+export type UpdateMenuItemInput = components["schemas"]["UpdateMenuItemDto"];
+export type MenuItemImage = components["schemas"]["MenuItemImageResponseDto"];
+export type PublicMenu = components["schemas"]["PublicMenuResponseDto"];
+export type UpdateMenuImageInput = components["schemas"]["UpdateMenuImageDto"];
 
-export interface LoginInput {
-  email: string
-  password: string
-}
+export type CategoryPage = components["schemas"]["CategoryPageDto"];
+export type MenuItemPage = components["schemas"]["MenuItemPageDto"];
+export type PaginationMeta = components["schemas"]["PaginationMetaDto"];
+export type CategoryQuery = NonNullable<
+  operations["CategoriesController_findAll"]["parameters"]["query"]
+>;
+export type MenuItemQuery = NonNullable<
+  operations["MenuItemsController_findAll"]["parameters"]["query"]
+>;
 
-export interface Restaurant {
-  id: string
-  name: string
-  slug: string
-  phone: string | null
-  address: string | null
-  currency: string
-  publicToken: string
-  status: RestaurantStatus
-  plan: RestaurantPlan
-  subscriptionExpiresAt: string | null
-  maxTables: number
-  maxMenuItems: number
-  maxUsers: number
-  createdAt: string
-  updatedAt: string
-}
-
-export interface CreateRestaurantAdminInput {
-  name: string
-  email: string
-  password: string
-}
-
-export interface CreateRestaurantInput {
-  name: string
-  slug?: string
-  phone?: string
-  address?: string
-  currency?: string
-  plan?: RestaurantPlan
-  admin: CreateRestaurantAdminInput
-}
-
-export interface PublicSignupInput {
-  name: string
-  slug?: string
-  phone?: string
-  address?: string
-  currency?: string
-  admin: CreateRestaurantAdminInput
-}
-
-export interface DiningTable {
-  id: string
-  restaurantId: string
-  label: string
-  qrToken: string
-  isActive: boolean
-  createdAt: string
-  updatedAt: string
-}
-
-export interface CreateTableInput {
-  label: string
-}
-
-export interface UpdateTableInput {
-  label?: string
-  isActive?: boolean
-}
-
-export interface TableQr {
-  tableId: string
-  label: string
-  url: string
-  qrCode: string
-}
-
-export interface GenericLink {
-  url: string
-  qrCode: string
-}
-
-export interface StaffUser {
-  id: string
-  restaurantId: string | null
-  name: string
-  email: string
-  role: UserRole
-  isActive: boolean
-  createdAt: string
-  updatedAt: string
-}
-
-export interface CreateUserInput {
-  restaurantId?: string
-  name: string
-  email: string
-  password: string
-  role: UserRole
-  isActive?: boolean
-}
-
-export interface UpdateUserInput {
-  name?: string
-  email?: string
-  password?: string
-  role?: UserRole
-  isActive?: boolean
-}
-
-export interface Branding {
-  logoUrl: string | null
-  logoDarkUrl: string | null
-  faviconUrl: string | null
-  bannerUrl: string | null
-  loginImageUrl: string | null
-  primaryColor: string
-  secondaryColor: string
-  accentColor: string
-  backgroundColor: string
-  surfaceColor: string
-  textColor: string
-  themeMode: ThemeMode
-  fontFamily: string | null
-  borderRadius: number
-  welcomeTitle: string | null
-  welcomeMessage: string | null
-  footerText: string | null
-  instagramUrl: string | null
-  facebookUrl: string | null
-  websiteUrl: string | null
-  whatsapp: string | null
-  createdAt: string
-  updatedAt: string
-}
-
-export interface UpdateBrandingInput {
-  primaryColor?: string
-  secondaryColor?: string
-  accentColor?: string
-  backgroundColor?: string
-  surfaceColor?: string
-  textColor?: string
-  themeMode?: ThemeMode
-  fontFamily?: string | null
-  borderRadius?: number
-  welcomeTitle?: string | null
-  welcomeMessage?: string | null
-  footerText?: string | null
-  instagramUrl?: string | null
-  facebookUrl?: string | null
-  websiteUrl?: string | null
-  whatsapp?: string | null
-}
-
-export interface ApiErrorPayload {
-  statusCode: number
-  message: string | string[]
-  error: string
-  timestamp: string
-  path: string
-}
+export type CreatePublicOrderInput =
+  components["schemas"]["CreatePublicOrderDto"];
+export type CreatePublicOrderResult =
+  components["schemas"]["CreatePublicOrderResponseDto"];
+export type PublicOrder = components["schemas"]["PublicOrderResponseDto"];
+export type PublicOrderStatus = PublicOrder["status"];
+export type StaffOrder = components["schemas"]["StaffOrderResponseDto"];
+export type StaffOrderPage = components["schemas"]["StaffOrderPageDto"];
+export type StaffOrderQuery = NonNullable<
+  operations["StaffOrdersController_list"]["parameters"]["query"]
+>;
+export type AcceptOrderInput = components["schemas"]["AcceptOrderDto"];
+export type RejectOrderInput = components["schemas"]["RejectOrderDto"];
+export type ChangeOrderStatusInput =
+  components["schemas"]["ChangeOrderStatusDto"];
+export type ReportSummary = components["schemas"]["SummaryResponseDto"];
+export type ReportQuery = NonNullable<
+  operations["ReportsController_summary"]["parameters"]["query"]
+>;

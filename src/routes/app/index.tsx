@@ -1,7 +1,7 @@
-import { createFileRoute, Link, redirect } from '@tanstack/react-router'
-import { format } from 'date-fns'
-import { pt } from 'date-fns/locale'
-import type { ReactNode } from 'react'
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { format } from "date-fns";
+import { pt } from "date-fns/locale";
+import type { ReactNode } from "react";
 import {
   ArrowRight,
   Building2,
@@ -12,17 +12,17 @@ import {
   Sparkles,
   Store,
   Users,
-} from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
-import { CreateRestaurantDialog } from '@/components/restaurants/create-restaurant-dialog'
-import { Button } from '@/components/ui/button'
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { CreateRestaurantDialog } from "@/components/restaurants/create-restaurant-dialog";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -30,54 +30,58 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { brandingQueryKey, useBranding } from '@/hooks/use-branding'
-import { useRestaurants } from '@/hooks/use-restaurants'
-import { isOnboardingComplete } from '@/lib/branding'
-import { getBranding } from '@/services/branding'
-import { useAuthStore } from '@/stores/auth-store'
-import { RestaurantStatus, UserRole } from '@/types/api'
+} from "@/components/ui/table";
+import { brandingQueryKey, useBranding } from "@/hooks/use-branding";
+import { useRestaurants } from "@/hooks/use-restaurants";
+import { isOnboardingComplete } from "@/lib/branding";
+import { getRestaurantAvailability } from "@/lib/restaurant-status";
+import { getBranding } from "@/services/branding";
+import { useAuthStore } from "@/stores/auth-store";
+import { UserRole } from "@/types/api";
 
-export const Route = createFileRoute('/app/')({
+export const Route = createFileRoute("/app/")({
   loader: async ({ context }) => {
-    const user = useAuthStore.getState().user
+    const user = useAuthStore.getState().user;
 
     if (!user || user.role === UserRole.SUPER_ADMIN || !user.restaurantId) {
-      return
+      return;
     }
 
     const branding = await context.queryClient.ensureQueryData({
       queryKey: brandingQueryKey,
       queryFn: getBranding,
-    })
+    });
 
     if (user.role === UserRole.ADMIN && !isOnboardingComplete(branding)) {
-      throw redirect({ to: '/app/onboarding' })
+      throw redirect({ to: "/app/onboarding" });
     }
   },
   component: DashboardPage,
-})
+});
 
 function DashboardPage() {
-  const user = useAuthStore((state) => state.user)
+  const user = useAuthStore((state) => state.user);
 
   if (!user) {
-    return null
+    return null;
   }
 
   if (user.role === UserRole.SUPER_ADMIN) {
-    return <PlatformDashboard />
+    return <PlatformDashboard />;
   }
 
-  return <RestaurantDashboard />
+  return <RestaurantDashboard />;
 }
 
 function PlatformDashboard() {
-  const { data: restaurants = [], isLoading } = useRestaurants()
+  const { data: restaurants = [], isLoading } = useRestaurants();
   const active = restaurants.filter(
-    (restaurant) => restaurant.status === RestaurantStatus.ACTIVE,
-  ).length
-  const suspended = restaurants.length - active
+    (restaurant) => getRestaurantAvailability(restaurant) === "active",
+  ).length;
+  const suspended = restaurants.filter(
+    (restaurant) => getRestaurantAvailability(restaurant) === "suspended",
+  ).length;
+  const expired = restaurants.length - active - suspended;
 
   return (
     <div className="space-y-8">
@@ -100,7 +104,7 @@ function PlatformDashboard() {
         />
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-4">
         <StatCard
           label="Restaurantes"
           value={restaurants.length}
@@ -114,6 +118,11 @@ function PlatformDashboard() {
         <StatCard
           label="Suspensos"
           value={suspended}
+          icon={<Clock className="size-4" />}
+        />
+        <StatCard
+          label="Expirados"
+          value={expired}
           icon={<Clock className="size-4" />}
         />
       </div>
@@ -167,18 +176,20 @@ function PlatformDashboard() {
                     <TableCell>
                       <Badge
                         variant={
-                          restaurant.status === RestaurantStatus.ACTIVE
-                            ? 'default'
-                            : 'destructive'
+                          getRestaurantAvailability(restaurant) === "active"
+                            ? "default"
+                            : "destructive"
                         }
                       >
-                        {restaurant.status === RestaurantStatus.ACTIVE
-                          ? 'Activo'
-                          : 'Suspenso'}
+                        {getRestaurantAvailability(restaurant) === "active"
+                          ? "Activo"
+                          : getRestaurantAvailability(restaurant) === "expired"
+                            ? "Expirado"
+                            : "Suspenso"}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-muted-foreground">
-                      {format(new Date(restaurant.createdAt), 'dd MMM yyyy', {
+                      {format(new Date(restaurant.createdAt), "dd MMM yyyy", {
                         locale: pt,
                       })}
                     </TableCell>
@@ -190,31 +201,28 @@ function PlatformDashboard() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
 
 function RestaurantDashboard() {
-  const user = useAuthStore((state) => state.user)
-  const { data: branding } = useBranding()
+  const user = useAuthStore((state) => state.user);
+  const { data: branding } = useBranding();
 
   if (!user) {
-    return null
+    return null;
   }
 
-  const onboardingComplete = branding
-    ? isOnboardingComplete(branding)
-    : false
-  const isAdmin = user.role === UserRole.ADMIN
+  const onboardingComplete = branding ? isOnboardingComplete(branding) : false;
+  const isAdmin = user.role === UserRole.ADMIN;
 
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">
-          Olá, {user.name.split(' ')[0]}
+          Olá, {user.name.split(" ")[0]}
         </h1>
         <p className="text-sm text-muted-foreground">
-          {branding?.welcomeTitle ??
-            'Bem-vindo ao painel do teu restaurante.'}
+          {branding?.welcomeTitle ?? "Bem-vindo ao painel do teu restaurante."}
         </p>
       </div>
 
@@ -235,17 +243,17 @@ function RestaurantDashboard() {
           <div className="flex-1 space-y-1 pb-1">
             <div className="flex flex-wrap items-center gap-2">
               <p className="text-lg font-semibold">
-                {branding?.welcomeTitle ?? 'Identidade por configurar'}
+                {branding?.welcomeTitle ?? "Identidade por configurar"}
               </p>
-              <Badge variant={onboardingComplete ? 'default' : 'secondary'}>
+              <Badge variant={onboardingComplete ? "default" : "secondary"}>
                 {onboardingComplete
-                  ? 'Onboarding concluído'
-                  : 'Onboarding pendente'}
+                  ? "Onboarding concluído"
+                  : "Onboarding pendente"}
               </Badge>
             </div>
             <p className="text-sm text-muted-foreground">
               {branding?.welcomeMessage ??
-                'Personaliza a marca para os teus clientes.'}
+                "Personaliza a marca para os teus clientes."}
             </p>
           </div>
           {isAdmin ? (
@@ -288,18 +296,16 @@ function RestaurantDashboard() {
             />
           </>
         ) : null}
-        <Card className="opacity-70">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Clock className="size-4" />
-              Pedidos em tempo real
-            </CardTitle>
-            <CardDescription>Disponível na próxima fase.</CardDescription>
-          </CardHeader>
-        </Card>
+        <QuickAction
+          title="Pedidos do balcão"
+          description="Consulta a fila e acompanha a preparação."
+          to="/app/orders"
+          icon={<Clock className="size-4" />}
+          actionLabel="Abrir fila"
+        />
       </div>
     </div>
-  )
+  );
 }
 
 function StatCard({
@@ -307,9 +313,9 @@ function StatCard({
   value,
   icon,
 }: {
-  label: string
-  value: number
-  icon: ReactNode
+  label: string;
+  value: number;
+  icon: ReactNode;
 }) {
   return (
     <Card>
@@ -323,7 +329,7 @@ function StatCard({
         </span>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 function QuickAction({
@@ -331,11 +337,18 @@ function QuickAction({
   description,
   to,
   icon,
+  actionLabel = "Configurar",
 }: {
-  title: string
-  description: string
-  to: '/app/onboarding' | '/app/tables' | '/app/team' | '/app/links'
-  icon: ReactNode
+  title: string;
+  description: string;
+  to:
+    | "/app/onboarding"
+    | "/app/tables"
+    | "/app/team"
+    | "/app/links"
+    | "/app/orders";
+  icon: ReactNode;
+  actionLabel?: string;
 }) {
   return (
     <Link to={to} className="group">
@@ -349,11 +362,11 @@ function QuickAction({
         </CardHeader>
         <CardContent>
           <span className="inline-flex items-center gap-1 text-sm font-medium text-primary">
-            Configurar
+            {actionLabel}
             <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
           </span>
         </CardContent>
       </Card>
     </Link>
-  )
+  );
 }

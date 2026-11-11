@@ -67,6 +67,8 @@ export function applyBranding(branding: Branding): void {
       '--font-sans',
       `'${branding.fontFamily}', ui-sans-serif, system-ui, sans-serif`,
     )
+  } else {
+    style.removeProperty('--font-sans')
   }
 }
 

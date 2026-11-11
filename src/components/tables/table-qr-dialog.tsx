@@ -1,6 +1,7 @@
 import {
   Copy,
   Download,
+  ExternalLink,
   Loader2,
   QrCode,
   RefreshCw,
@@ -126,6 +127,18 @@ export function TableQrDialog({ table, trigger }: TableQrDialogProps) {
           </Button>
 
           <div className="flex flex-wrap gap-2">
+            {qrQuery.data && (
+              <Button type="button" variant="outline" asChild>
+                <a
+                  href={qrQuery.data.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <ExternalLink className="size-4" />
+                  Abrir menu
+                </a>
+              </Button>
+            )}
             <Button type="button" variant="outline" asChild>
               <a
                 href={qrQuery.data?.qrCode}
